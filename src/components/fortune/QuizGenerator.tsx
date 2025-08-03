@@ -13,7 +13,7 @@ export default function QuizGenerator() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer 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',
+          Authorization: 'Bearer ',
         },
         body: JSON.stringify({
           model: 'z-ai/glm-4.5-air:free',
