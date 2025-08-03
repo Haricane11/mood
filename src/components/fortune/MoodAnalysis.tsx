@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Brain, Heart, Zap, Sun, CloudRain, Star, Sparkles } from 'lucide-react';
-import { Mood, UserProfile } from './FortuneApp';
+import { Mood, UserProfile } from '../../pages/Fortune';
 import { Progress } from '@/components/ui/progress';
 
 interface MoodAnalysisProps {

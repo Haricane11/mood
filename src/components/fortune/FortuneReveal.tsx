@@ -1,66 +1,93 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Eye, RefreshCw, Star, Heart } from 'lucide-react';
-import { Mood } from './FortuneApp';
+import { Mood } from '../../pages/Fortune';
+import { supabase } from '@/integrations/supabase/client';
 
 interface FortuneRevealProps {
   mood: Mood;
   userName: string;
 }
 
-const motivationalQuotes = {
-  energetic: [
-    "Your energy is your superpower. Channel it wisely and watch mountains move!",
-    "The fire within you burns brighter than any obstacle ahead.",
-    "Your enthusiasm is contagious - spread it like wildfire!",
-    "Action is the foundational key to all success. Keep moving forward!",
-    "Your dynamic spirit can turn any challenge into an opportunity."
-  ],
-  calm: [
-    "In stillness, you find your greatest strength and clearest vision.",
-    "Peace is not the absence of storm, but your ability to find calm within it.",
-    "Your centered spirit guides you to make the wisest decisions.",
-    "Like a mountain, you stand firm while storms pass around you.",
-    "Your inner peace radiates outward, healing the world around you."
-  ],
-  anxious: [
-    "Your sensitivity is a gift - it shows how deeply you care.",
-    "Every worry is your heart's way of protecting what matters most.",
-    "Breathe deeply. You have overcome every challenge before this one.",
-    "Your thoughtful nature prepares you for success in ways others miss.",
-    "Trust the process. Your careful consideration leads to the best outcomes."
-  ],
-  happy: [
-    "Your joy is a beacon of light that brightens everyone's day.",
-    "Happiness is not a destination, it's your natural way of traveling.",
-    "Your positive energy creates ripples of good in the universe.",
-    "Keep shining! Your light helps others find their way.",
-    "Gratitude turns what you have into enough, and you have so much!"
-  ],
-  melancholic: [
-    "Your depth of feeling creates the most beautiful art and insights.",
-    "In your quiet moments, wisdom whispers the deepest truths.",
-    "Your emotional intelligence is a rare and precious gift.",
-    "Every ending prepares the soil for a more beautiful beginning.",
-    "Your gentle soul understands what others take lifetimes to learn."
-  ],
-  hopeful: [
-    "Your hope is the seed from which miracles grow.",
-    "The future belongs to those who believe in their dreams - like you!",
-    "Your optimism is proof that your soul knows something beautiful is coming.",
-    "Keep planting seeds of hope. Your garden of dreams is ready to bloom.",
-    "Your faith in tomorrow gives you strength to transform today."
-  ]
-};
+// const motivationalQuotes = {
+//   energetic: [
+//     "Your energy is your superpower. Channel it wisely and watch mountains move!",
+//     "The fire within you burns brighter than any obstacle ahead.",
+//     "Your enthusiasm is contagious - spread it like wildfire!",
+//     "Action is the foundational key to all success. Keep moving forward!",
+//     "Your dynamic spirit can turn any challenge into an opportunity."
+//   ],
+//   calm: [
+//     "In stillness, you find your greatest strength and clearest vision.",
+//     "Peace is not the absence of storm, but your ability to find calm within it.",
+//     "Your centered spirit guides you to make the wisest decisions.",
+//     "Like a mountain, you stand firm while storms pass around you.",
+//     "Your inner peace radiates outward, healing the world around you."
+//   ],
+//   anxious: [
+//     "Your sensitivity is a gift - it shows how deeply you care.",
+//     "Every worry is your heart's way of protecting what matters most.",
+//     "Breathe deeply. You have overcome every challenge before this one.",
+//     "Your thoughtful nature prepares you for success in ways others miss.",
+//     "Trust the process. Your careful consideration leads to the best outcomes."
+//   ],
+//   happy: [
+//     "Your joy is a beacon of light that brightens everyone's day.",
+//     "Happiness is not a destination, it's your natural way of traveling.",
+//     "Your positive energy creates ripples of good in the universe.",
+//     "Keep shining! Your light helps others find their way.",
+//     "Gratitude turns what you have into enough, and you have so much!"
+//   ],
+//   melancholic: [
+//     "Your depth of feeling creates the most beautiful art and insights.",
+//     "In your quiet moments, wisdom whispers the deepest truths.",
+//     "Your emotional intelligence is a rare and precious gift.",
+//     "Every ending prepares the soil for a more beautiful beginning.",
+//     "Your gentle soul understands what others take lifetimes to learn."
+//   ],
+//   hopeful: [
+//     "Your hope is the seed from which miracles grow.",
+//     "The future belongs to those who believe in their dreams - like you!",
+//     "Your optimism is proof that your soul knows something beautiful is coming.",
+//     "Keep planting seeds of hope. Your garden of dreams is ready to bloom.",
+//     "Your faith in tomorrow gives you strength to transform today."
+//   ]
+// };
 
 export const FortuneReveal = ({ mood, userName }: FortuneRevealProps) => {
   const [isRevealing, setIsRevealing] = useState(false);
   const [currentQuote, setCurrentQuote] = useState<string | null>(null);
   const [showParticles, setShowParticles] = useState(false);
+  const [motivationalQuotes, setMotivationalQuotes] = useState([]);
+  
+  useEffect(() => {
+    const quotes = [];
+    const fetchQuotes = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('fortune_quotes')
+          .select('quote')
+          .eq('feeling', mood)
 
-  const quotes = motivationalQuotes[mood];
+        if (error) {
+          throw error
+        }
 
+        if (data) {
+          data.map((d, index) => (
+            quotes.push(d.quote)
+          ))
+          setMotivationalQuotes(quotes)
+        }
+      } catch (error) {
+        console.log("Error fetching quotes", error)
+      }
+
+    }
+
+    fetchQuotes();
+  }, [mood])
   const revealWisdom = () => {
     if (isRevealing) return;
 
@@ -69,7 +96,7 @@ export const FortuneReveal = ({ mood, userName }: FortuneRevealProps) => {
     setShowParticles(true);
 
     setTimeout(() => {
-      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
       setCurrentQuote(randomQuote);
       setIsRevealing(false);
       setShowParticles(false);
@@ -81,6 +108,8 @@ export const FortuneReveal = ({ mood, userName }: FortuneRevealProps) => {
     setIsRevealing(false);
     setShowParticles(false);
   };
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-100 dark:from-gray-900 dark:via-purple-900 dark:to-pink-900 py-12 relative overflow-hidden transition-colors">

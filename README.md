@@ -71,3 +71,11 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+
+**Should run after manually created tables in Supabase**
+npm install -g supabase@latest
+npx supabase login
+supabase init
+supabase link --project-ref YOUR_PROJECT_REF
+npx supabase gen types typescript --project-id "YOUR_PROJECT_REF" --schema public > src/integrations/supabase/types.ts
